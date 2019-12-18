@@ -70,8 +70,10 @@ public class CheckboxExpendableAdapter extends BaseExpandableListAdapter {
                 }else{
                     selectedStrings.remove(cb.getText().toString());
                 }
+                String listTitle = (String) getGroup(listPosition);
                 Fragment myStocks = new MyStocksFragment();
                 Bundle args = new Bundle();
+                args.putString("soort",listTitle);
                 args.putStringArrayList("list", selectedStrings);
                 myStocks.setArguments(args);
                 FragmentTransaction transaction =((FragmentActivity)context).getSupportFragmentManager().beginTransaction();

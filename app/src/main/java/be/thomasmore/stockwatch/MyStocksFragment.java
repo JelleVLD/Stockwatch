@@ -36,6 +36,7 @@ public class MyStocksFragment extends Fragment {
     private DatabaseHelper db;
     private View view;
     private Company company;
+    private Crypto newCrypto;
     ExpandableListView expandableListView;
     ExpandableListAdapter expandableListAdapter;
     List<String> expandableListTitle;
@@ -55,29 +56,71 @@ public class MyStocksFragment extends Fragment {
         expandableListAdapter = new CheckboxExpendableAdapter(getActivity(), expandableListTitle, expandableListDetail);
         expandableListView.setAdapter(expandableListAdapter);
         if( getArguments() != null) {
-            selectedStrings = getArguments().getStringArrayList("list");
-            int index = selectedStrings.get(0).indexOf(':');
-            String result = selectedStrings.get(0).substring(0, index);
-            Company companie = db.getCompanyByName(result);
-            Log.e("test123", companie.getSymbol().toString());
-            TextView companyTitle = (TextView) view.findViewById(R.id.mycompanyTitle);
-            companyTitle.setText(companie.getName());
-            ImageView imageViewImage = (ImageView) view.findViewById(R.id.myimage);
-            Picasso.get().load(companie.getImage()).into(imageViewImage);
-            TextView aangekochtePrijs = (TextView) view.findViewById(R.id.prijsaangekocht);
-            aangekochtePrijs.setText(companie.getPrice().toString());
-            HttpReader httpReader = new HttpReader();
-            httpReader.setOnResultReadyListener(new HttpReader.OnResultReadyListener() {
-                @Override
-                public void resultReady(String result) {
-                    JsonHelper jsonHelper = new JsonHelper();
-                    company = jsonHelper.getCompany(result);
+            if (getArguments().getString("soort") == "Company"){
+                selectedStrings = getArguments().getStringArrayList("list");
+                int index = selectedStrings.get(0).indexOf(':');
+                String result = selectedStrings.get(0).substring(0, index);
+                final Company companie = db.getCompanyByName(result);
+                Log.e("test123", companie.getSymbol().toString());
+                TextView companyTitle = (TextView) view.findViewById(R.id.mycompanyTitle);
+                companyTitle.setText(companie.getName());
+                ImageView imageViewImage = (ImageView) view.findViewById(R.id.myimage);
+                Picasso.get().load(companie.getImage()).into(imageViewImage);
+                TextView aangekochtePrijs = (TextView) view.findViewById(R.id.prijsaangekocht);
+                aangekochtePrijs.setText("Bought Price:" +companie.getPrice().toString());
+                HttpReader httpReader = new HttpReader();
+                httpReader.setOnResultReadyListener(new HttpReader.OnResultReadyListener() {
+                    @Override
+                    public void resultReady(String result) {
+                        JsonHelper jsonHelper = new JsonHelper();
+                        company = jsonHelper.getCompany(result);
 
-                    TextView textViewExchange = (TextView) view.findViewById(R.id.prijsnu);
-                    textViewExchange.setText(company.getPrice().toString());
+                        TextView textViewTekst = (TextView) view.findViewById(R.id.tekst);
+                        textViewTekst.setText("Difference since buy:");
+                        TextView textViewExchange = (TextView) view.findViewById(R.id.prijsnu);
+                        textViewExchange.setText("Current Price: "+company.getPrice().toString());
+                        TextView textViewVerschil = (TextView) view.findViewById(R.id.verschil);
+                        double verschil = company.getPrice()- companie.getPrice();
+                        String tussenberekening = Double.toString(verschil);
+                        int index = tussenberekening.indexOf(".");
+                        tussenberekening= tussenberekening.substring(0,index+4);
+                        textViewVerschil.setText("€"+tussenberekening);
+                    }
+                });
+                httpReader.execute("https://financialmodelingprep.com/api/v3/company/profile/" + companie.getSymbol());
+            }else{
+                if(getArguments().getString("soort")=="Crypto"){
+                    selectedStrings = getArguments().getStringArrayList("list");
+                    int index = selectedStrings.get(0).indexOf(':');
+                    String result = selectedStrings.get(0).substring(0, index);
+                    final Crypto crypto = db.getMyCryptoByName(result);
+                    Log.e("test123", crypto.getTicker().toString());
+                    TextView companyTitle = (TextView) view.findViewById(R.id.mycompanyTitle);
+                    companyTitle.setText(crypto.getName());
+                    TextView aangekochtePrijs = (TextView) view.findViewById(R.id.prijsaangekocht);
+                    aangekochtePrijs.setText("Bought Price: " +crypto.getPrice().toString());
+                    HttpReader httpReader = new HttpReader();
+                    httpReader.setOnResultReadyListener(new HttpReader.OnResultReadyListener() {
+                        @Override
+                        public void resultReady(String result) {
+                            JsonHelper jsonHelper = new JsonHelper();
+                            newCrypto = jsonHelper.getCrypto(result);
+                            TextView textViewTekst = (TextView) view.findViewById(R.id.tekst);
+                            textViewTekst.setText("Difference since buy:");
+                            TextView textViewExchange = (TextView) view.findViewById(R.id.prijsnu);
+                            textViewExchange.setText("Current Price: "+newCrypto.getPrice().toString());
+                            TextView textViewVerschil = (TextView) view.findViewById(R.id.verschil);
+                            double verschil = newCrypto.getPrice() - crypto.getPrice();
+                            String tussenberekening = Double.toString(verschil);
+                            int index = tussenberekening.indexOf(".");
+                            tussenberekening= tussenberekening.substring(0,index+4);
+                            textViewVerschil.setText("€"+tussenberekening);
+                        }
+                    });
+                    httpReader.execute("https://financialmodelingprep.com/api/v3/cryptocurrency/" + crypto.getTicker());
                 }
-            });
-            httpReader.execute("https://financialmodelingprep.com/api/v3/company/profile/" + companie.getSymbol());
+            }
+
 
         }
         return view;

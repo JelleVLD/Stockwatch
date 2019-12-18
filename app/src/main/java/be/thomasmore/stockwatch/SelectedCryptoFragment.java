@@ -33,6 +33,7 @@ public class SelectedCryptoFragment extends Fragment {
         final View view = inflater.inflate(R.layout.fragment_selected_crypto, container, false);
         Bundle args = getArguments();
         String stock = args.getString("Stock", "");
+        Log.e("test",stock);
         db = new DatabaseHelper(getActivity());
         HttpReader httpReader = new HttpReader();
         httpReader.setOnResultReadyListener(new HttpReader.OnResultReadyListener() {
