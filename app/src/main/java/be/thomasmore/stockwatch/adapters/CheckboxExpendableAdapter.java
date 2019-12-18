@@ -1,24 +1,39 @@
 package be.thomasmore.stockwatch.adapters;
 
-import java.util.HashMap;
-import java.util.List;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Typeface;
+import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
-import be.thomasmore.stockwatch.R;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
-public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import be.thomasmore.stockwatch.MyStocksFragment;
+import be.thomasmore.stockwatch.R;
+import be.thomasmore.stockwatch.SelectedCompanyFragment;
+
+public class CheckboxExpendableAdapter extends BaseExpandableListAdapter {
 
     private Context context;
     private List<String> expandableListTitle;
     private HashMap<String, List<String>> expandableListDetail;
+    ArrayList<String> selectedStrings = new ArrayList<String>();
 
-    public CustomExpandableListAdapter(Context context, List<String> expandableListTitle,
+    public CheckboxExpendableAdapter(Context context, List<String> expandableListTitle,
                                        HashMap<String, List<String>> expandableListDetail) {
         this.context = context;
         this.expandableListTitle = expandableListTitle;
@@ -37,17 +52,35 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public View getChildView(int listPosition, final int expandedListPosition,
+    public View getChildView(final int listPosition, final int expandedListPosition,
                              boolean isLastChild, View convertView, ViewGroup parent) {
         final String expandedListText = (String) getChild(listPosition, expandedListPosition);
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = layoutInflater.inflate(R.layout.list_item, null);
+            convertView = layoutInflater.inflate(R.layout.list_item_checkbox, null);
         }
-        TextView expandedListTextView = (TextView) convertView
-                .findViewById(R.id.expandedListItem);
-        expandedListTextView.setText(expandedListText);
+        final CheckBox cb = (CheckBox) convertView.findViewById(R.id.checkbox);
+        cb.setText(expandedListText);
+        cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    selectedStrings.add(cb.getText().toString());
+                }else{
+                    selectedStrings.remove(cb.getText().toString());
+                }
+                Fragment myStocks = new MyStocksFragment();
+                Bundle args = new Bundle();
+                args.putStringArrayList("list", selectedStrings);
+                myStocks.setArguments(args);
+                FragmentTransaction transaction =((FragmentActivity)context).getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container, myStocks); // give your fragment container id in first parameter
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+
+        });
         return convertView;
     }
 
@@ -96,5 +129,9 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public boolean isChildSelectable(int listPosition, int expandedListPosition) {
         return true;
+    }
+
+    public ArrayList<String> getChecked() {
+        return selectedStrings;
     }
 }

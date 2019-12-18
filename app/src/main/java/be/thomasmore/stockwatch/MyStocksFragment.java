@@ -1,6 +1,7 @@
 package be.thomasmore.stockwatch;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,17 +11,16 @@ import android.widget.ExpandableListView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import be.thomasmore.stockwatch.adapters.CheckboxExpendableAdapter;
 import be.thomasmore.stockwatch.adapters.CustomExpandableListAdapter;
 import be.thomasmore.stockwatch.helpers.DatabaseHelper;
 import be.thomasmore.stockwatch.models.Company;
 import be.thomasmore.stockwatch.models.Crypto;
-import be.thomasmore.stockwatch.models.Forex;
 
 public class MyStocksFragment extends Fragment {
 
@@ -31,9 +31,13 @@ public class MyStocksFragment extends Fragment {
     ExpandableListAdapter expandableListAdapter;
     List<String> expandableListTitle;
     HashMap<String, List<String>> expandableListDetail;
+    ArrayList<String> selectedStrings = new ArrayList<String>();
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        if( getArguments() != null)
+            selectedStrings = getArguments().getStringArrayList("list");
+        Log.e("test123",selectedStrings.toString());
         db = new DatabaseHelper(getActivity());
         view = inflater.inflate(R.layout.fragment_my_stocks,
                 container, false);
@@ -42,42 +46,8 @@ public class MyStocksFragment extends Fragment {
         readMyCompanies();
         expandableListView = (ExpandableListView) view.findViewById(R.id.myStocks);
         expandableListTitle = new ArrayList<String>(expandableListDetail.keySet());
-        expandableListAdapter = new CustomExpandableListAdapter(getActivity(), expandableListTitle, expandableListDetail);
+        expandableListAdapter = new CheckboxExpendableAdapter(getActivity(), expandableListTitle, expandableListDetail);
         expandableListView.setAdapter(expandableListAdapter);
-        expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                if (expandableListTitle.get(groupPosition) == "Crypto"){
-                    Crypto crypto =  db.getCryptoByName(expandableListDetail.get(
-                            expandableListTitle.get(groupPosition)).get(
-                            childPosition).substring(5));
-                    Fragment selectedStock = new SelectedCryptoFragment();
-                    Bundle args = new Bundle();
-                    args.putString("Stock", crypto.getTicker());
-                    selectedStock.setArguments(args);
-                    FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                    transaction.replace(R.id.fragment_container, selectedStock); // give your fragment container id in first parameter
-                    transaction.addToBackStack(null);
-                    transaction.commit();
-                }
-                if (expandableListTitle.get(groupPosition) == "Company"){
-                    String tekst = expandableListDetail.get(
-                            expandableListTitle.get(groupPosition)).get(
-                            childPosition);
-                    String subString = tekst.substring(0, tekst.indexOf(':'));
-                    Fragment selectedCompany = new SelectedCompanyFragment();
-                    Bundle args = new Bundle();
-                    args.putString("Stock", subString);
-                    selectedCompany.setArguments(args);
-                    FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                    transaction.replace(R.id.fragment_container, selectedCompany); // give your fragment container id in first parameter
-                    transaction.addToBackStack(null);
-                    transaction.commit();
-                }
-                return false;
-            }
-        });
-
         return view;
     }
     private void readMyCryptos() {
