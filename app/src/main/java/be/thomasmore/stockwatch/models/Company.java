@@ -25,6 +25,9 @@ public class Company {
 
     }
 
+    public Company(int id) {
+        this.id = id;
+    }
 
     public Company(int id, String symbol, String name, Double price, Double beta, int volAvg, Double mktCap, Double lastDiv, String range, Double changes, String changesPercentage, String exchange, String industry, String website, String description, String ceo, String sector, String image) {
         this.id = id;

@@ -1,5 +1,8 @@
 package be.thomasmore.stockwatch;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,10 +34,12 @@ public class FavoritesFragment extends Fragment {
     private DatabaseHelper db;
     private View view;
 
+
     ExpandableListView expandableListView;
     ExpandableListAdapter expandableListAdapter;
     List<String> expandableListTitle;
     HashMap<String, List<String>> expandableListDetail;
+
 
     @Nullable
     @Override
@@ -43,6 +48,8 @@ public class FavoritesFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_favorites,
                 container, false);
         expandableListDetail = new HashMap<>();
+
+
         readCryptos();
         readCompanies();
         readForexes();
@@ -52,52 +59,96 @@ public class FavoritesFragment extends Fragment {
         expandableListView.setAdapter(expandableListAdapter);
         expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                if (expandableListTitle.get(groupPosition) == "Crypto"){
-                    Crypto crypto =  db.getCryptoByName(expandableListDetail.get(
-                            expandableListTitle.get(groupPosition)).get(
-                            childPosition).substring(5));
-                    Fragment selectedStock = new SelectedCryptoFragment();
-                    Bundle args = new Bundle();
-                    args.putString("Stock", crypto.getTicker());
-                    selectedStock.setArguments(args);
-                    FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                    transaction.replace(R.id.fragment_container, selectedStock); // give your fragment container id in first parameter
-                    transaction.addToBackStack(null);
-                    transaction.commit();
-                }
-                if (expandableListTitle.get(groupPosition) == "Company"){
-                    String tekst = expandableListDetail.get(
-                            expandableListTitle.get(groupPosition)).get(
-                            childPosition);
-                    String subString = tekst.substring(0, tekst.indexOf(':'));
-                    Fragment selectedCompany = new SelectedCompanyFragment();
-                    Bundle args = new Bundle();
-                    args.putString("Stock", subString);
-                    selectedCompany.setArguments(args);
-                    FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                    transaction.replace(R.id.fragment_container, selectedCompany); // give your fragment container id in first parameter
-                    transaction.addToBackStack(null);
-                    transaction.commit();
-                }
-                if (expandableListTitle.get(groupPosition) == "Forex"){
-                    String string = expandableListDetail.get(
-                            expandableListTitle.get(groupPosition)).get(
-                            childPosition);
-                    String subString = "";
-                    int index = string.indexOf("/");
-                    if (index != -1) {
-                        subString = string.substring(0, index)+string.substring(index+1);
-                    }
-                    Fragment selectedFedex = new SelectedFedexFragment();
-                    Bundle args = new Bundle();
-                    args.putString("Stock", subString);
-                    selectedFedex.setArguments(args);
-                    FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                    transaction.replace(R.id.fragment_container, selectedFedex); // give your fragment container id in first parameter
-                    transaction.addToBackStack(null);
-                    transaction.commit();
-                }
+            public boolean onChildClick(ExpandableListView parent, View v, final int groupPosition, final int childPosition, long id) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder
+                        .setMessage("Details bekijken of verwijderen?")
+                        .setPositiveButton("Details", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                if (expandableListTitle.get(groupPosition) == "Crypto") {
+                                    Crypto crypto = db.getCryptoByName(expandableListDetail.get(
+                                            expandableListTitle.get(groupPosition)).get(
+                                            childPosition).substring(5));
+                                    Fragment selectedStock = new SelectedCryptoFragment();
+                                    Bundle args = new Bundle();
+                                    args.putString("Stock", crypto.getTicker());
+                                    selectedStock.setArguments(args);
+                                    FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                                    transaction.replace(R.id.fragment_container, selectedStock); // give your fragment container id in first parameter
+                                    transaction.addToBackStack(null);
+                                    transaction.commit();
+                                }
+                                if (expandableListTitle.get(groupPosition) == "Company") {
+                                    String tekst = expandableListDetail.get(
+                                            expandableListTitle.get(groupPosition)).get(
+                                            childPosition);
+                                    String subString = tekst.substring(0, tekst.indexOf(':'));
+                                    Fragment selectedCompany = new SelectedCompanyFragment();
+                                    Bundle args = new Bundle();
+                                    args.putString("Stock", subString);
+                                    selectedCompany.setArguments(args);
+                                    FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                                    transaction.replace(R.id.fragment_container, selectedCompany); // give your fragment container id in first parameter
+                                    transaction.addToBackStack(null);
+                                    transaction.commit();
+                                }
+                                if (expandableListTitle.get(groupPosition) == "Forex") {
+                                    String string = expandableListDetail.get(
+                                            expandableListTitle.get(groupPosition)).get(
+                                            childPosition);
+                                    String subString = "";
+                                    int index = string.indexOf("/");
+                                    if (index != -1) {
+                                        subString = string.substring(0, index) + string.substring(index + 1);
+                                    }
+                                    Fragment selectedFedex = new SelectedFedexFragment();
+                                    Bundle args = new Bundle();
+                                    args.putString("Stock", subString);
+                                    selectedFedex.setArguments(args);
+                                    FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                                    transaction.replace(R.id.fragment_container, selectedFedex); // give your fragment container id in first parameter
+                                    transaction.addToBackStack(null);
+                                    transaction.commit();
+                                }
+                            }
+                        })
+                        .setNegativeButton("Verwijder", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                if (expandableListTitle.get(groupPosition) == "Crypto") {
+                                    Crypto crypto = db.getCryptoByName(expandableListDetail.get(
+                                            expandableListTitle.get(groupPosition)).get(
+                                            childPosition).substring(5));
+                                    db.deleteCrypto(crypto.getId());
+                                    readCryptos();
+                                }
+                                if (expandableListTitle.get(groupPosition) == "Company") {
+                                    String tekst = expandableListDetail.get(
+                                            expandableListTitle.get(groupPosition)).get(
+                                            childPosition);
+                                    String subString = tekst.substring(0, tekst.indexOf(':'));
+                                    Company company = db.getCompanyByName(subString);
+                                    db.deleteCompany(company.getId());
+                                    readCompanies();
+                                }
+                                if (expandableListTitle.get(groupPosition) == "Forex") {
+                                    String string = expandableListDetail.get(
+                                            expandableListTitle.get(groupPosition)).get(
+                                            childPosition);
+                                    Log.i("testId", string);
+                                    Forex forex = db.getForexByName(string);
+                                    db.deleteForex(forex.getId());
+                                    readForexes();
+                                }
+
+                                getFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                                        new FavoritesFragment()).addToBackStack(null).commit();
+                                getFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                                        new FavoritesFragment()).addToBackStack(null).commit();
+                            }
+                        })
+                        .show();
                 return false;
             }
         });
@@ -116,7 +167,7 @@ public class FavoritesFragment extends Fragment {
         expandableListDetail.put("Crypto", cryptosText);
     }
 
-    private void readCompanies(){
+    private void readCompanies() {
         final List<Company> companies = db.getCompanies();
         List<String> companiesText = new ArrayList<>();
         for (Company company : companies) {
@@ -126,7 +177,7 @@ public class FavoritesFragment extends Fragment {
         expandableListDetail.put("Company", companiesText);
     }
 
-    private void readForexes(){
+    private void readForexes() {
         final List<Forex> forexes = db.getForex();
         List<String> forexText = new ArrayList<>();
         for (Forex forex : forexes) {
@@ -135,4 +186,6 @@ public class FavoritesFragment extends Fragment {
 
         expandableListDetail.put("Forex", forexText);
     }
+
+
 }

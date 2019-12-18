@@ -27,6 +27,10 @@ public class Forex {
         this.date = date;
     }
 
+    public Forex(int id) {
+        this.id = id;
+    }
+
     public int getId() {
         return id;
     }

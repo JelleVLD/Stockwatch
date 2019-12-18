@@ -200,37 +200,42 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return id;
     }
-    // update-methode met ContentValues
-//    public boolean updatePresident(President president) {
-    //      SQLiteDatabase db = this.getWritableDatabase();
-//
-    //      ContentValues values = new ContentValues();
-    //    values.put("name", president.getName());
-    //  values.put("term", president.getTerm());
-    //values.put("partyId", president.getPartyId());
-//
-//        int numrows = db.update(
-    //              "president",
-    //            values,
-    //          "id = ?",
-    //
-//        db.close();
-    //      return numrows > 0;
-    //}
 
     // delete-methode
-//    public boolean deletePresident(long id) {
-    //      SQLiteDatabase db = this.getWritableDatabase();
-//
-    //      int numrows = db.delete(
-    //            "president",
-    //          "id = ?",
-    //        new String[] { String.valueOf(id) });
-//
-    //      db.close();
-    //    return numrows > 0;
-    //   }
-//
+    public boolean deleteCrypto(long id) {
+          SQLiteDatabase db = this.getWritableDatabase();
+
+          int numrows = db.delete(
+                "favoriteCrypto",
+              "id = ?",
+            new String[] { String.valueOf(id) });
+
+          db.close();
+        return numrows > 0;
+       }
+    public boolean deleteCompany(long id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        int numrows = db.delete(
+                "favoriteCompany",
+                "id = ?",
+                new String[] { String.valueOf(id) });
+
+        db.close();
+        return numrows > 0;
+    }
+    public boolean deleteForex(long id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        int numrows = db.delete(
+                "favoriteForex",
+                "id = ?",
+                new String[] { String.valueOf(id) });
+
+        db.close();
+        return numrows > 0;
+    }
+
     // query-methode
     public Crypto getCryptoByName(String name) {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -269,6 +274,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return crypto;
     }
+
     public Company getCompanyByName(String name) {
         String selectQuery = "SELECT  * FROM favoriteCompany  WHERE symbol = '"+name+"'";
 
@@ -287,7 +293,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return company;
     }
-    //
+
+
+    public Forex getForexByName(String name) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(
+                "favoriteForex",      // tabelnaam
+                new String[]{"id"}, // kolommen
+                "ticker = ?",  // selectie
+                new String[]{name}, // selectieparameters
+                null,           // groupby
+                null,           // having
+                null,           // sorting
+                null);          // ??
+
+        Forex forex = new Forex();
+
+        if (cursor.moveToFirst()) {
+            forex = new Forex(cursor.getInt(0));
+        }
+        cursor.close();
+        db.close();
+        return forex;
+    }
+
     // rawQuery-methode
     public List<Crypto> getCryptos() {
         List<Crypto> lijst = new ArrayList<Crypto>();
@@ -400,38 +430,5 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return lijst;
     }
-    // rawQuery-methode
-    //   public List<Party> getParties() {
-    //     List<Party> lijst = new ArrayList<Party>();
-
-    //   String selectQuery = "SELECT  * FROM party ORDER BY name";
-
-    // SQLiteDatabase db = this.getReadableDatabase();
-    //    Cursor cursor = db.rawQuery(selectQuery, null);
-
-    //  if (cursor.moveToFirst()) {
-    //    do {
-    //      Party party = new Party(cursor.getLong(0), cursor.getString(1));
-    //    lijst.add(party);
-    //         } while (cursor.moveToNext());
-    //   }
-//
-    //      cursor.close();
-    //    db.close();
-    //  return lijst;
-    //  }
-
-    // rawQuery-methode
-    //  public int getCountPresidents() {
-    //      String selectQuery = "SELECT  * FROM president";
-
-    //    SQLiteDatabase db = this.getReadableDatabase();
-    //  Cursor cursor = db.rawQuery(selectQuery, null);
-    //     int aantal = cursor.getCount();
-
-    //   cursor.close();
-    // db.close();
-    //    return aantal;
-    // }
 
 }
