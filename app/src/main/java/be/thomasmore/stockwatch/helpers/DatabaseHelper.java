@@ -369,27 +369,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return lijst;
     }
-
-    public List<Forex> getMyForex() {
-        List<Forex> lijst = new ArrayList<Forex>();
-
-        String selectQuery = "SELECT  * FROM favoriteForex  WHERE favoriet = 0 ORDER BY ticker";
-
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-                Forex forex = new Forex(cursor.getInt(0), cursor.getString(1), cursor.getDouble(2), cursor.getDouble(3),
-                        cursor.getDouble(4), cursor.getDouble(5), cursor.getDouble(6), cursor.getDouble(7), cursor.getString(8));
-                lijst.add(forex);
-            } while (cursor.moveToNext());
-        }
-
-        cursor.close();
-        db.close();
-        return lijst;
-    }
     // rawQuery-methode
     //   public List<Party> getParties() {
     //     List<Party> lijst = new ArrayList<Party>();

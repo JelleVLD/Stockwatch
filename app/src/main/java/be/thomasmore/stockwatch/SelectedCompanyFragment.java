@@ -141,7 +141,7 @@ public class SelectedCompanyFragment extends Fragment {
         addmy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                List<Company> companies = db.getCompanies();
+                List<Company> companies = db.getMyCompanies();
                 List<String> names = new ArrayList<>();
                 for (Company company : companies) {
                     names.add(company.getName());

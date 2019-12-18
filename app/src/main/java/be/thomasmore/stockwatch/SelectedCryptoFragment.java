@@ -95,7 +95,7 @@ public class SelectedCryptoFragment extends Fragment {
         addmy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                List<Crypto> cryptos = db.getCryptos();
+                List<Crypto> cryptos = db.getMyCryptos();
                 List<String> names = new ArrayList<>();
                 for (Crypto crypto: cryptos){
                     names.add(crypto.getName());

@@ -99,14 +99,4 @@ public class MyStocksFragment extends Fragment {
 
         expandableListDetail.put("Company", companiesText);
     }
-
-    private void readMyForexes(){
-        final List<Forex> forexes = db.getMyForex();
-        List<String> forexText = new ArrayList<>();
-        for (Forex forex : forexes) {
-            forexText.add(forex.getTicker());
-        }
-
-        expandableListDetail.put("Forex", forexText);
-    }
 }
