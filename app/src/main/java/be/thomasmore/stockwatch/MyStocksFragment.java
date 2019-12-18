@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -35,9 +36,6 @@ public class MyStocksFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if( getArguments() != null)
-            selectedStrings = getArguments().getStringArrayList("list");
-        Log.e("test123",selectedStrings.toString());
         db = new DatabaseHelper(getActivity());
         view = inflater.inflate(R.layout.fragment_my_stocks,
                 container, false);
@@ -48,6 +46,11 @@ public class MyStocksFragment extends Fragment {
         expandableListTitle = new ArrayList<String>(expandableListDetail.keySet());
         expandableListAdapter = new CheckboxExpendableAdapter(getActivity(), expandableListTitle, expandableListDetail);
         expandableListView.setAdapter(expandableListAdapter);
+        if( getArguments() != null)
+            selectedStrings = getArguments().getStringArrayList("list");
+        Log.e("test123",selectedStrings.toString());
+        TextView geselecteerd = (TextView) view.findViewById(R.id.geselecteerd);
+        geselecteerd.setText(selectedStrings.toString());
         return view;
     }
     private void readMyCryptos() {
