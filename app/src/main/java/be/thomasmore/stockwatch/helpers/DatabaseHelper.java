@@ -255,7 +255,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return crypto;
     }
+    public Company getCompanyByName(String name) {
+        String selectQuery = "SELECT  * FROM favoriteCompany  WHERE symbol = '"+name+"'";
 
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        Company company = new Company();
+
+        if (cursor.moveToFirst()) {
+            company =new Company(cursor.getInt(0), cursor.getString(1),
+                    cursor.getString(2), cursor.getDouble(3), cursor.getDouble(4), cursor.getInt(5),
+                    cursor.getDouble(6), cursor.getDouble(7), cursor.getString(8), cursor.getDouble(9),
+                    cursor.getString(10), cursor.getString(11),cursor.getString(12),cursor.getString(13),cursor.getString(14),cursor.getString(14),cursor.getString(16), cursor.getString(17));
+        }
+        cursor.close();
+        db.close();
+        return company;
+    }
     //
     // rawQuery-methode
     public List<Crypto> getCryptos() {
