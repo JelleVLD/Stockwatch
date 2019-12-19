@@ -3,6 +3,7 @@ package be.thomasmore.stockwatch;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,7 @@ import androidx.fragment.app.Fragment;
 
 import com.squareup.picasso.Picasso;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,30 +63,29 @@ public class MyStocksFragment extends Fragment {
                 int index = selectedStrings.get(0).indexOf(':');
                 String result = selectedStrings.get(0).substring(0, index);
                 final Company companie = db.getCompanyByName(result);
-                Log.e("test123", companie.getSymbol().toString());
                 TextView companyTitle = (TextView) view.findViewById(R.id.mycompanyTitle);
                 companyTitle.setText(companie.getName());
                 ImageView imageViewImage = (ImageView) view.findViewById(R.id.myimage);
                 Picasso.get().load(companie.getImage()).into(imageViewImage);
                 TextView aangekochtePrijs = (TextView) view.findViewById(R.id.prijsaangekocht);
-                aangekochtePrijs.setText("Bought Price:" +companie.getPrice().toString());
+                String bought = "<b>Bought price: </b> $" + companie.getPrice();
+                aangekochtePrijs.setText(Html.fromHtml(bought));
                 HttpReader httpReader = new HttpReader();
                 httpReader.setOnResultReadyListener(new HttpReader.OnResultReadyListener() {
                     @Override
                     public void resultReady(String result) {
                         JsonHelper jsonHelper = new JsonHelper();
                         company = jsonHelper.getCompany(result);
-
+                        String current = "<b>Current Price: </b>$" + company.getPrice();
+                        String diff = "<b>Difference since buy: </b>";
                         TextView textViewTekst = (TextView) view.findViewById(R.id.tekst);
-                        textViewTekst.setText("Difference since buy:");
+                        textViewTekst.setText(Html.fromHtml(diff));
                         TextView textViewExchange = (TextView) view.findViewById(R.id.prijsnu);
-                        textViewExchange.setText("Current Price: "+company.getPrice().toString());
+                        textViewExchange.setText(Html.fromHtml(current));
                         TextView textViewVerschil = (TextView) view.findViewById(R.id.verschil);
                         double verschil = company.getPrice()- companie.getPrice();
-                        String tussenberekening = Double.toString(verschil);
-                        int index = tussenberekening.indexOf(".");
-                        tussenberekening= tussenberekening.substring(0,index+4);
-                        textViewVerschil.setText("€"+tussenberekening);
+                        double roundedVerschil = Math.round(verschil);
+                        textViewVerschil.setText("€"+roundedVerschil);
                     }
                 });
                 httpReader.execute("https://financialmodelingprep.com/api/v3/company/profile/" + companie.getSymbol());
@@ -94,11 +95,11 @@ public class MyStocksFragment extends Fragment {
                     int index = selectedStrings.get(0).indexOf(':');
                     String result = selectedStrings.get(0).substring(0, index);
                     final Crypto crypto = db.getMyCryptoByName(result);
-                    Log.e("test123", crypto.getTicker().toString());
                     TextView companyTitle = (TextView) view.findViewById(R.id.mycompanyTitle);
                     companyTitle.setText(crypto.getName());
                     TextView aangekochtePrijs = (TextView) view.findViewById(R.id.prijsaangekocht);
-                    aangekochtePrijs.setText("Bought Price: " +crypto.getPrice().toString());
+                    String bought = "<b>Bought price: </b> $" + crypto.getPrice();
+                    aangekochtePrijs.setText(Html.fromHtml(bought));
                     HttpReader httpReader = new HttpReader();
                     httpReader.setOnResultReadyListener(new HttpReader.OnResultReadyListener() {
                         @Override
@@ -106,15 +107,15 @@ public class MyStocksFragment extends Fragment {
                             JsonHelper jsonHelper = new JsonHelper();
                             newCrypto = jsonHelper.getCrypto(result);
                             TextView textViewTekst = (TextView) view.findViewById(R.id.tekst);
-                            textViewTekst.setText("Difference since buy:");
+                            String current = "<b>Current Price: </b>$" + newCrypto.getPrice();
+                            String diff = "<b>Difference since buy: </b>";
+                            textViewTekst.setText(Html.fromHtml(diff));
                             TextView textViewExchange = (TextView) view.findViewById(R.id.prijsnu);
-                            textViewExchange.setText("Current Price: "+newCrypto.getPrice().toString());
+                            textViewExchange.setText(Html.fromHtml(current));
                             TextView textViewVerschil = (TextView) view.findViewById(R.id.verschil);
                             double verschil = newCrypto.getPrice() - crypto.getPrice();
-                            String tussenberekening = Double.toString(verschil);
-                            int index = tussenberekening.indexOf(".");
-                            tussenberekening= tussenberekening.substring(0,index+4);
-                            textViewVerschil.setText("€"+tussenberekening);
+                            double roundedVerschil = Math.round(verschil);
+                            textViewVerschil.setText("$"+roundedVerschil);
                         }
                     });
                     httpReader.execute("https://financialmodelingprep.com/api/v3/cryptocurrency/" + crypto.getTicker());

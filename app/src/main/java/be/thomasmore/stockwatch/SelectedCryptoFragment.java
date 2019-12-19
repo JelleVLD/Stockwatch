@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,21 +44,23 @@ public class SelectedCryptoFragment extends Fragment {
                 currentCrypto = jsonHelper.getCrypto(result);
 
                 TextView textViewTitle = (TextView) view.findViewById(R.id.title);
-                textViewTitle.setPaintFlags(Paint.UNDERLINE_TEXT_FLAG);
                 textViewTitle.setText(currentCrypto.getName());
 
                 TextView textViewCode = (TextView) view.findViewById(R.id.code);
-                textViewCode.setText(currentCrypto.getTicker());
+                String codeString = "<b>Code: </b> " + currentCrypto.getTicker();
+                textViewCode.setText(Html.fromHtml(codeString));
 
                 TextView textViewChanges = (TextView) view.findViewById(R.id.changes);
-                textViewChanges.setText(currentCrypto.getChanges().toString());
+                String changesString = "<b>Changes: </b> " + currentCrypto.getChanges().toString();
+
+                textViewChanges.setText(Html.fromHtml(changesString));
 
                 TextView textViewPrice = (TextView) view.findViewById(R.id.price);
-                textViewPrice.setText("$" + currentCrypto.getPrice().toString());
-
+                String priceString = "<b>Price: </b>$" + currentCrypto.getPrice().toString();
+                textViewPrice.setText(Html.fromHtml(priceString));
 
                 TextView textViewExtraTekst = (TextView) view.findViewById(R.id.extraTekst);
-                textViewExtraTekst.setText("Current market cap.:");
+                textViewExtraTekst.setText("Current market cap:");
                 TextView textViewExtra = (TextView) view.findViewById(R.id.extra);
                 textViewExtra.setText(String.valueOf(currentCrypto.getMarketCapitalization()));
             }

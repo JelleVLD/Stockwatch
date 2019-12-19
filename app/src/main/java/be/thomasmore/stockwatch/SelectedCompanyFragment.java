@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -64,32 +65,44 @@ public class SelectedCompanyFragment extends Fragment {
                 Picasso.get().load(company.getImage()).into(imageViewImage);
 
                 TextView textViewPrice = (TextView) view.findViewById(R.id.price);
-                textViewPrice.setText(getResources().getText(R.string.detail_price) + company.getPrice().toString());
+                String priceString = "<b>Price: </b>$" + company.getPrice().toString();
+                textViewPrice.setText(Html.fromHtml(priceString));
 
                 TextView textViewChange = (TextView) view.findViewById(R.id.change);
-                textViewChange.setText(getResources().getText(R.string.detail_change) + company.getChanges().toString() + " " + company.getChangesPercentage());
+                String changeString = "<b>Change: </b>" + company.getChanges().toString() + " " + company.getChangesPercentage();
+                textViewChange.setText(Html.fromHtml(changeString));
 
                 TextView textViewExchange = (TextView) view.findViewById(R.id.exchange);
-                textViewExchange.setText(getResources().getText(R.string.detail_exchange) + company.getExchange());
+                String exchangeString = "<b>Exchange: </b>" + company.getExchange();
+                textViewExchange.setText(Html.fromHtml(exchangeString));
 
                 TextView textViewDescription = (TextView) view.findViewById(R.id.description);
                 textViewDescription.setText(company.getDescription());
 
                 TextView textViewCeo = (TextView) view.findViewById(R.id.ceo);
-                if (company.getCeo().equals("")) {
-                    textViewCeo.setText(getResources().getText(R.string.detail_ceo) + "No CEO found");
-                } else {
-                    textViewCeo.setText(getResources().getText(R.string.detail_ceo) + company.getCeo());
-                }
+                String ceoString;
 
+                if (company.getCeo().equals("")) {
+                    ceoString = "<b>CEO: </b>No CEO found";
+                } else {
+                    ceoString = "<b>CEO: </b>" + company.getCeo();
+
+                }
+                textViewCeo.setText(Html.fromHtml(ceoString));
+
+                String sectorString;
                 TextView textViewSector = (TextView) view.findViewById(R.id.sector);
                 if (company.getSector().equals("")) {
                     textViewSector.setText(getResources().getText(R.string.detail_Sector) + "No sector found");
+                    sectorString = "<b>Sector:</b> No sector found!";
                 } else {
-                    textViewSector.setText(getResources().getText(R.string.detail_Sector) + company.getSector());
+                    sectorString = "<b>Sector: </b>" + company.getSector();
                 }
-                Button websiteButton = (Button) view.findViewById(R.id.website);
 
+                textViewSector.setText(Html.fromHtml(sectorString));
+
+
+                Button websiteButton = (Button) view.findViewById(R.id.website);
                 websiteButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

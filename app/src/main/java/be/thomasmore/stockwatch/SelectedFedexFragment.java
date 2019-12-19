@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,26 +47,37 @@ public class SelectedFedexFragment extends Fragment {
                 JsonHelper jsonHelper = new JsonHelper();
                 forex = jsonHelper.getForex(result);
                 TextView textViewTitle= (TextView)view.findViewById(R.id.title);
-                textViewTitle.setPaintFlags(Paint.UNDERLINE_TEXT_FLAG);
                 textViewTitle.setText(forex.getTicker());
 
+
+                String bid = "<b>Bid:</b> " + forex.getBid();
                 TextView textViewBid= (TextView)view.findViewById(R.id.bid);
-                textViewBid.setText(Double.toString(forex.getBid()));
+                textViewBid.setText(Html.fromHtml(bid));
 
+                String ask = "<b>Ask: </b>"  + forex.getAsk();
                 TextView textViewAsk= (TextView)view.findViewById(R.id.ask);
-                textViewAsk.setText(Double.toString(forex.getAsk()));
+                textViewAsk.setText(Html.fromHtml(ask));
 
+
+                String low = "<b>Low: </b>" + forex.getLow();
                 TextView textViewLow= (TextView)view.findViewById(R.id.low);
-                textViewLow.setText(Double.toString(forex.getLow()));
+                textViewLow.setText(Html.fromHtml(low));
 
+                String high = "<b>High: </b>" + forex.getHigh();
                 TextView textViewHigh= (TextView)view.findViewById(R.id.high);
-                textViewHigh.setText(Double.toString(forex.getHigh()));
+                textViewHigh.setText(Html.fromHtml(high));
 
+                String open = "<b>Open: </b>" + forex.getOpen();
                 TextView textViewOpen= (TextView)view.findViewById(R.id.open);
-                textViewOpen.setText(Double.toString(forex.getOpen()));
+                textViewOpen.setText(Html.fromHtml(open));
 
+
+
+                DecimalFormat df = new DecimalFormat("#.##");
+
+                String changes = "<b>Changes: </b>" +  df.format(forex.getChanges());
                 TextView textViewChanges= (TextView)view.findViewById(R.id.changes);
-                textViewChanges.setText(Double.toString(forex.getChanges()));
+                textViewChanges.setText(Html.fromHtml(changes));
 
             }
         });
