@@ -1,7 +1,11 @@
 package be.thomasmore.stockwatch;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -32,13 +36,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toggle.syncState();
 
 
-        if (savedInstanceState == null){
+        if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                     new HomeFragment()).addToBackStack(null).commit();
             navigationView.setCheckedItem(R.id.home);
         }
 
 
+    }
+
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     @Override
@@ -51,14 +63,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 toolbar.setTitle("Home");
                 break;
             case R.id.nav_my_stocks:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                        new MyStocksFragment()).addToBackStack(null).commit();
-                toolbar.setTitle("My stocks");
+                if (isNetworkAvailable()) {
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                            new MyStocksFragment()).addToBackStack(null).commit();
+                    toolbar.setTitle("My stocks");
+                } else {
+                    Toast toast = Toast.makeText(this, "No internet connection", Toast.LENGTH_LONG);
+                    toast.show();
+                }
                 break;
             case R.id.nav_favorites:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                        new FavoritesFragment()).addToBackStack(null).commit();
-                toolbar.setTitle("Favorites");
+                if (isNetworkAvailable()) {
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                            new FavoritesFragment()).addToBackStack(null).commit();
+                    toolbar.setTitle("Favorites");
+                } else {
+                    Toast toast = Toast.makeText(this, "No internet connection", Toast.LENGTH_LONG);
+                    toast.show();
+                }
                 break;
             case R.id.nav_info:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
@@ -78,19 +100,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            if ((getSupportFragmentManager().getBackStackEntryCount() > 0))
-            {
-                if (currentFragment instanceof HomeFragment){
+            if ((getSupportFragmentManager().getBackStackEntryCount() > 0)) {
+                if (currentFragment instanceof HomeFragment) {
                     System.exit(1);
-                } else{
+                } else {
                     getSupportFragmentManager().popBackStack();
                 }
-            } else{
+            } else {
                 super.onBackPressed();
             }
         }
     }
-
 
 
 }
