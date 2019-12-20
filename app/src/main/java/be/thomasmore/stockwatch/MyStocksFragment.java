@@ -61,6 +61,7 @@ public class MyStocksFragment extends Fragment {
         expandableListAdapter = new CheckboxExpendableAdapter(getActivity(), expandableListTitle, expandableListDetail);
         expandableListView.setAdapter(expandableListAdapter);
         final Button verwijderKnop = (Button) view.findViewById(R.id.verwijderKnop);
+        verwijderKnop.setVisibility(View.GONE);
         verwijderKnop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
